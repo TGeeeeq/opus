@@ -1,0 +1,225 @@
+digraph SolarOffGrid12V {
+    graph [
+        rankdir=LR
+        fontname="Arial"
+        fontsize=16
+        label="Ostrovní FV systém 12 V — 2× 100 Wp v sérii, MPPT, LiFePO4 100 Ah, střídač 500 W\n(orientační schéma pro pochopení principu, ne realizační projekt)"
+        labelloc=t
+        labeljust=c
+        splines=spline
+        nodesep=0.7
+        ranksep=1.3
+        compound=true
+        newrank=true
+        bgcolor=white
+        pad=0.8
+    ]
+    node [fontname="Arial" fontsize=10 style="filled,rounded" shape=box margin="0.2,0.12"]
+    edge [
+        fontname="Arial"
+        fontsize=9
+        penwidth=1.5
+        labelfontsize=9
+        labeldistance=2.4
+        labelangle=25
+    ]
+
+    node [shape=invtriangle style=filled fillcolor="#444444" fontcolor=white
+          fontsize=8 width=0.4 height=0.28 margin="0.04,0.04" label="PE"]
+    pe_pv
+
+    node [shape=box style="filled,rounded" fontsize=10 fontcolor=black margin="0.2,0.12"]
+
+    subgraph cluster_pv {
+        label="1 · Zdroj — FV string (sériově)"
+        style="filled,rounded" fillcolor="#FFF8E1" color="#E65100" penwidth=2
+
+        PV1 [label="Panel 1\n100 Wp mono\nVmp ≈ 18 V · Voc ≈ 22,5 V\nImp ≈ 5,6 A · Isc ≈ 5,9 A"
+             width=2.0 height=1.2 fillcolor="#FFE0B2" color="#E65100"]
+        PV2 [label="Panel 2\n100 Wp mono\nVmp ≈ 18 V · Voc ≈ 22,5 V\nImp ≈ 5,6 A · Isc ≈ 5,9 A"
+             width=2.0 height=1.2 fillcolor="#FFE0B2" color="#E65100"]
+        STRING [label="String celkem\nVmp ≈ 36 V · Voc ≈ 45 V\n(v mrazu až ~50 V)\nI ≈ 5,6 A · 200 Wp"
+                shape=note fillcolor="#FFFDE7" color="#E65100" fontsize=9]
+        pe_pv
+    }
+
+    subgraph cluster_pvdisc {
+        label="2 · Odpojení FV"
+        style="filled,rounded" fillcolor="#E3F2FD" color="#1565C0" penwidth=2
+
+        PVBRK [label="DC odpínač / jistič 2P\n16 A · ≥ 500 V DC\n(odpojí + i −)"
+               width=1.9 height=1.1 fillcolor="#BBDEFB" color="#1565C0"]
+    }
+
+    subgraph cluster_mppt {
+        label="3 · Konverze — solární regulátor"
+        style="filled,rounded" fillcolor="#FCE4EC" color="#880E4F" penwidth=2
+
+        MPPT [label="MPPT regulátor 75/15\nPV vstup max. 75 V\nvýstup 12 V / 15 A\n+ LOAD výstup s odpojením\npři podpětí baterie"
+              width=2.4 height=1.6 fillcolor="#F8BBD0" color="#880E4F"]
+    }
+
+    subgraph cluster_bat {
+        label="4 · Akumulace"
+        style="filled,rounded" fillcolor="#FFF8E1" color="#E65100" penwidth=2
+
+        BAT [label="Baterie LiFePO4\n12,8 V · 100 Ah\n≈ 1,28 kWh\n(vestavěný BMS)"
+             shape=cylinder width=1.4 height=1.4 fillcolor="#FFECB3" color="#E65100"]
+        FMAIN [label="Hlavní pojistka\n80 A (MEGA/ANL)\nco nejblíž k +pólu"
+               width=1.7 height=1.0 fillcolor="#FFCDD2" color="#B71C1C"]
+        SW [label="Hlavní vypínač\nbaterie"
+            width=1.5 height=0.9 fillcolor="#BBDEFB" color="#1565C0"]
+    }
+
+    subgraph cluster_dist {
+        label="5 · Rozvod a jištění větví"
+        style="filled,rounded" fillcolor="#E3F2FD" color="#1565C0" penwidth=2
+
+        FMPPT [label="Pojistka 20 A\n(větev MPPT)"
+               width=1.4 height=0.8 fillcolor="#FFCDD2" color="#B71C1C"]
+        BUSP [label="Sběrnice +\n12,8 V"
+              shape=diamond fillcolor="#FFF3CD" color="#CC7700" penwidth=2.8
+              width=1.8 height=1.0 fontsize=10]
+        BUSN [label="Sběrnice −\n(společný mínus)"
+              shape=diamond fillcolor="#EEEEEE" color="#444444" penwidth=2.8
+              width=1.8 height=1.0 fontsize=10]
+        FINV [label="Pojistka 60 A\n(větev střídače)"
+              width=1.4 height=0.8 fillcolor="#FFCDD2" color="#B71C1C"]
+    }
+
+    subgraph cluster_ac {
+        label="6a · Spotřebiče 230 V"
+        style="filled,rounded" fillcolor="#FBE9E7" color="#BF360C" penwidth=2
+
+        INV [label="Střídač 12 V → 230 V AC\n500 W · čistý sinus\n(odběr z baterie až ~46 A)"
+             width=2.2 height=1.2 fillcolor="#FFCCBC" color="#BF360C"]
+        AC [label="Zásuvky 230 V\nnotebook, nabíječky,\nmalé čerpadlo"
+            width=1.9 height=1.0 fillcolor="#FFE0B2" color="#BF360C"]
+    }
+
+    subgraph cluster_dc {
+        label="6b · Spotřebiče 12 V"
+        style="filled,rounded" fillcolor="#FBE9E7" color="#BF360C" penwidth=2
+
+        FDC [label="Pojistková skříňka\n12 V (2–10 A)"
+             width=1.6 height=0.9 fillcolor="#FFCDD2" color="#B71C1C"]
+        DC [label="12 V spotřebiče\nLED světla, USB,\nventilátor"
+            shape=ellipse width=1.8 height=1.0 fillcolor="#FFF3E0" color="#BF360C"]
+    }
+
+    { rank=same; MPPT; FMAIN }
+    { rank=same; BUSP; BUSN }
+
+    PV1 -> PV2 [
+        taillabel="PV1 −"  headlabel="PV2 +"
+        label="sériové propojení\nMC4, 4 mm²"
+        color="#E65100" penwidth=2 labelfontcolor="#E65100"
+    ]
+    PV1 -> PVBRK [
+        taillabel="PV1 +"  headlabel="vstup +"
+        label="solární kabel 4 mm²"
+        color="#E65100" penwidth=2.5 labelfontcolor="#E65100"
+    ]
+    PV2 -> PVBRK [
+        taillabel="PV2 −"  headlabel="vstup −"
+        color="#444444" penwidth=2.5 labelfontcolor="#444444"
+    ]
+    PV2 -> pe_pv [
+        taillabel="rámy"  headlabel="uzemnění"
+        color="#2E7D32" style=dashed penwidth=1.5 labelfontcolor="#2E7D32"
+        arrowhead=none constraint=false
+    ]
+    STRING -> PV1 [style=invis]
+
+    PVBRK -> MPPT [
+        taillabel="výstup +"  headlabel="PV +"
+        color="#E65100" penwidth=2.5 labelfontcolor="#E65100"
+    ]
+    PVBRK -> MPPT [
+        taillabel="výstup −"  headlabel="PV −"
+        color="#444444" penwidth=2.5 labelfontcolor="#444444"
+    ]
+
+    MPPT -> FMPPT [
+        taillabel="BAT +"  headlabel="vstup"
+        label="6 mm²\nnabíjecí proud"
+        color="#CC7700" penwidth=2 labelfontcolor="#CC7700"
+    ]
+    FMPPT -> BUSP [
+        taillabel="výstup"  headlabel="+"
+        color="#CC7700" penwidth=2 labelfontcolor="#CC7700"
+    ]
+    MPPT -> BUSN [
+        taillabel="BAT −"  headlabel="−"
+        label="6 mm²"
+        color="#444444" penwidth=2 labelfontcolor="#444444"
+    ]
+
+    BAT -> FMAIN [
+        taillabel="+ pól"  headlabel="vstup"
+        label="25 mm²"
+        color="#E65100" penwidth=3 labelfontcolor="#E65100"
+    ]
+    FMAIN -> SW [
+        taillabel="výstup"  headlabel="vstup"
+        color="#E65100" penwidth=3 labelfontcolor="#E65100"
+    ]
+    SW -> BUSP [
+        taillabel="výstup"  headlabel="+"
+        label="25 mm²"
+        color="#E65100" penwidth=3 labelfontcolor="#E65100"
+    ]
+    BAT -> BUSN [
+        taillabel="− pól"  headlabel="−"
+        label="25 mm²"
+        color="#444444" penwidth=3 labelfontcolor="#444444"
+    ]
+
+    BUSP -> FINV [
+        taillabel="+"  headlabel="vstup"
+        color="#CC7700" penwidth=3 labelfontcolor="#CC7700"
+    ]
+    FINV -> INV [
+        taillabel="výstup"  headlabel="DC +"
+        label="16 mm², max. ~1,5 m"
+        color="#CC7700" penwidth=3 labelfontcolor="#CC7700"
+    ]
+    BUSN -> INV [
+        taillabel="−"  headlabel="DC −"
+        label="16 mm²"
+        color="#444444" penwidth=3 labelfontcolor="#444444"
+    ]
+    INV -> AC [
+        taillabel="AC L/N/PE"  headlabel="zásuvky"
+        label="230 V AC"
+        color="#BF360C" penwidth=2 labelfontcolor="#BF360C"
+    ]
+
+    MPPT -> FDC [
+        taillabel="LOAD +"  headlabel="vstup"
+        label="2,5 mm²"
+        color="#CC7700" penwidth=2 labelfontcolor="#CC7700"
+    ]
+    FDC -> DC [
+        taillabel="okruhy"  headlabel="+"
+        color="#CC7700" penwidth=1.8 labelfontcolor="#CC7700"
+    ]
+    DC -> MPPT [
+        taillabel="−"  headlabel="LOAD −"
+        color="#444444" penwidth=1.5 labelfontcolor="#444444"
+        constraint=false
+    ]
+
+    LEGEND [shape=plaintext style="" fontsize=9 label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="3" COLOR="#999999">
+        <TR><TD COLSPAN="2"><B>Legenda</B></TD></TR>
+        <TR><TD><FONT COLOR="#E65100"><B>━━</B></FONT></TD><TD ALIGN="LEFT">FV string a hlavní + větev baterie</TD></TR>
+        <TR><TD><FONT COLOR="#CC7700"><B>━━</B></FONT></TD><TD ALIGN="LEFT">jištěné 12 V větve</TD></TR>
+        <TR><TD><FONT COLOR="#444444"><B>━━</B></FONT></TD><TD ALIGN="LEFT">mínus (−), vede proud stejně jako +</TD></TR>
+        <TR><TD><FONT COLOR="#BF360C"><B>━━</B></FONT></TD><TD ALIGN="LEFT">230 V AC</TD></TR>
+        <TR><TD><FONT COLOR="#2E7D32"><B>╌╌</B></FONT></TD><TD ALIGN="LEFT">ochranné uzemnění (PE) rámů</TD></TR>
+        <TR><TD COLSPAN="2" ALIGN="LEFT"><B>Pořadí zapojení:</B> 1) baterie → MPPT  2) FV → MPPT  3) spotřebiče<BR ALIGN="LEFT"/><B>Odpojení:</B> v opačném pořadí (nejdřív FV, baterie naposled)<BR ALIGN="LEFT"/></TD></TR>
+        </TABLE>
+    >]
+    { rank=same; LEGEND; PV1 }
+}
